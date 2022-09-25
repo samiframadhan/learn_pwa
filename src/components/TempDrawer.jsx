@@ -1,4 +1,4 @@
-import { Button, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box } from '@mui/material';
+import { Button, Drawer, List, ListItem, ListItemButton, ListItemText, Box } from '@mui/material';
 import React from 'react';
 
 function TempDrawer() {

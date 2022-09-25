@@ -1,60 +1,121 @@
-import * as React from 'react';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
+import React, {useEffect} from 'react';
+import {Routes, Route, Link, useNavigate} from 'react-router-dom';
+import Landing from './components/Landing';
+import Login from './components/Login';
+import Profile from './components/Profile';
+import ToDoList from './components/ToDoList';
+import Register from './components/Register';
 import Box from '@mui/material/Box';
-import { AppBar } from '@mui/material';
-import Projects from './components/Projects';
-import School from './components/School';
-import TempDrawer from './components/TempDrawer';
-
-
-function createProject(nomor,
-  nama, deskripsi, rentang, valuasi){
-    return {nomor, nama, deskripsi, rentang, valuasi}
-  }
-
-const projectData = [
-  createProject(1, "Loak Smart Table", "Membuat meja pintar terkoneksi dengan internet serta fitur premium seperti speaker, lampu RGB, hingga penjadwalan mati/nyala kelistrikan", "2019 - 2020", "Rp.20.000.000"),
-  createProject(2, "Suafotobooth", "Photobooth modern dengan sistem self-service serta terkoneksi ke sistem penyimpanan cloud", "2022", "Rp.11.000.000"),
-  createProject(3, "Autonomous Robot", "Robot dengan kecerdasan buatan yang dapat diperintahkan ke tempat yang diinginkan menggunakan teknologi LiDAR", "2019-2022", "Rp.50.000.000")
-]
-
-function createData(nomor, sekolah, tahun, pengalaman) {
-    return {nomor, sekolah, tahun, pengalaman}
-}
-
-const rowdata = [
-  createData(1, "SDN Gumuruh Utara", 2009, "Bermain"),
-  createData(2, "SMPN 30 Bandung", 2013, "Belajar"),
-  createData(3, "SMAN 3 Bandung", 2016, "Volunteer"),
-  createData(4, "Universitas Padjadjaran", 2022, "Riset"),
-]
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/icons-material/Menu';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Drawer from '@mui/material/Drawer';
+import Abc from '@mui/icons-material/Abc';
+import { useDispatch, useSelector } from 'react-redux';
+import { getMe, LogOut, reset } from './feature/authSlice';
 
 export default function App() {
+  const [state, setState] = React.useState(false);
+  const {user, isSuccess} = useSelector((state)=> state.auth)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    dispatch(getMe())
+  }, [dispatch]);
+
+  const logout = () => {
+    dispatch(LogOut());
+    dispatch(reset());
+    navigate("/");
+    console.log("Logout clicked")
+  }
+
+  const toggleDrawer = (open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+
+    setState(open);
+  }
+
+  const handleButtons = (index) => {
+    switch(index){
+      case 0:
+        return '/login';
+      case 1:
+        return '/profile';
+      case 2:
+        return '/tdlist';
+      default:
+        return '/';
+    }
+  }
+
+  const list = () => (
+    <Box 
+      sx={{ width: 250 }}
+      role="presentation"
+      onClick={toggleDrawer(false)}
+      onKeyDown={toggleDrawer(false)}>
+      <List>
+        {['Login', 'My Profile', 'To Do List', 'Another Page'].map((text, index) => (
+          <ListItem key={index}>
+            <ListItemButton href={handleButtons(index)}>
+              <ListItemIcon>
+                <Abc/>
+              </ListItemIcon>
+              <ListItemText primary={text}/>
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+  console.log(isSuccess);
 
   return (
-    <Box sx={{ flexGrow: 1}}>
-      
-      <Container maxWidth="sm">
-        <Box sx={{ flexGrow: 1 }}>
-          <AppBar position='static'>
-            <Typography my={4} variant='h3' align='center'>
-              My Portfolio
-            </Typography>
-          </AppBar>
-        </Box>
-      </Container>
-      <Container maxWidth="false">
-        <Typography margin={5} variant='h4' align='left'>
-          Sami Fauzan Ramadhan
-        </Typography>
-        <Typography my={4} variant='h6' align='left'>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Culpa dicta iure porro nihil est, accusantium distinctio dignissimos ipsa qui voluptatibus? Qui distinctio totam earum provident voluptatibus et non fuga unde voluptate neque illo, libero quos quo id nesciunt aliquid iusto labore. Eveniet, suscipit sint, molestiae veniam atque nemo eligendi pariatur doloremque inventore odio harum, iure rem! Consequatur reiciendis delectus quaerat fuga obcaecati non libero. Pariatur fugiat dolor magni amet tenetur saepe nostrum aliquid perspiciatis, ratione illo laboriosam enim quisquam eaque tempore sit doloremque veritatis sed autem esse veniam blanditiis accusantium quibusdam perferendis deleniti! Ad, corporis? Ex, voluptatem! Veritatis, porro est?
-        </Typography>
-      </Container>
-      <School rowdata={rowdata}/>
-      <Projects projectData={projectData}/>
-      <TempDrawer/>
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={toggleDrawer(true)}
+            sx={{ mr: 2 }}
+          >
+            <Menu/>
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            My Portofolio
+          </Typography>
+          
+          <Button onClick={logout}>Logout</Button>
+        </Toolbar>
+      </AppBar>
+      <React.Fragment>
+        <Drawer anchor='left' open={state} onClose={toggleDrawer(false)}>
+          {list()}
+        </Drawer>
+      </React.Fragment>
+      <Routes>
+        <Route index element={<Landing/>}/>
+        <Route path='login' element={<Login/>}/>
+        <Route path='tdlist' element={<ToDoList/>}/>
+        <Route path='profile' element={<Profile/>}/>
+        <Route path='register' element={<Register/>}/>
+        <Route path='*' element={<p>There is nothing here: 404!</p>}/>
+      </Routes>
     </Box>
   );
 }
