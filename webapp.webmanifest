@@ -1,0 +1,16 @@
+{
+    "name": "Learn Progressive Web App",
+    "short_name": "AuthVite",
+    "description": "A learning project to create a Progressive Web App using existing developed web",
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#B12A34",
+    "icons": [
+        {
+            "src": "./favicon.ico",
+            "sizes": "70x70",
+            "type": "image/ico"
+        }
+    ]
+}
